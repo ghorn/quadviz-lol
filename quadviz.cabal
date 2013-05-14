@@ -1,0 +1,18 @@
+name:                quadviz
+synopsis:            Quad Flight Visualizer
+version:             0.1.0.0
+license:             BSD3
+license-file:        LICENSE
+build-type:          Simple
+cabal-version:       >=1.8
+
+executable quadplot
+  hs-source-dirs:    src
+  main-is:           Quadplot.hs
+  other-modules:     ParseFiles,
+                     Types
+  build-depends:     base >= 4.5.0 && < 4.7,
+                     not-gloss >= 0.5.0,
+                     spatial-math,
+                     containers
+  ghc-options:       -O2 -threaded -with-rtsopts=-T
