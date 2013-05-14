@@ -7,4 +7,7 @@ module Types ( Rotor(..)
 import SpatialMath
 
 data Rotor = Rotor (Xyz Double) (Xyz Double) Double deriving Show
-data QuadCopter = QuadCopter (Xyz Double) (Quat Double) [Rotor] deriving Show
+data QuadCopter = QuadCopter { qcPos :: Xyz Double
+                             , qcRot :: Quat Double
+                             , qcRotors :: [Rotor]
+                             } deriving Show
