@@ -1,7 +1,4 @@
 {-# OPTIONS_GHC -Wall #-}
--- {-# Language DoAndIfThenElse #-}
--- {-# Language OverloadedStrings #-}
--- {-# Language CPP #-}
 
 module Main ( main ) where
 
@@ -40,13 +37,19 @@ drawTrail positions = Vis.Line' $ zip positions colors
 drawFun :: State -> Vis.VisObject Double
 drawFun (State [] _) = error "drawFun got empty list of quads :'("
 drawFun (State (Nothing:_) _) = error "should never try to draw Nothing ;_;"
-drawFun (State (Just quad:_) trails') = nwu2ned $ Vis.VisObjects [drawOneQuad quad, axes, trails, plane]
+drawFun (State (Just quad:_) trails') =
+  nwu2ned $ Vis.VisObjects [drawOneQuad quad, axes, trails, plane,txt]
   where
     nwu2ned = Vis.RotQuat $ Quat 0 1 0 0
     axes = Vis.Axes (0.5, 15)
     plane = Vis.Plane (Xyz 0 0 1) (Vis.makeColor 1 1 1 1) (Vis.makeColor 0.2 0.3 0.32 (realToFrac planeAlpha))
     planeAlpha = 0.1 :: Double
     trails = Vis.VisObjects $ map drawTrail trails'
+    txt = Vis.VisObjects $
+          zipWith (\s k -> Vis.Text2d s (30,fromIntegral $ 30*k) Vis.TimesRoman24 (Vis.makeColor 1 1 1 1)) messages (reverse [1..length messages])
+    messages = zipWith f (qcRotors quad) [(0::Int)..]
+      where
+        f (Rotor _ _ mag) k= "rotor #"++show k++": " ++ show mag
 
 getTrailPoints :: QuadCopter -> [Xyz Double]
 getTrailPoints qc = map getOneTrailPoint (qcRotors qc)
@@ -73,8 +76,6 @@ main :: IO ()
 main = do
   let folder = "/home/ghorn/quadviz/quadcopter_results"
   quads <- getStates folder
---  print (length integrationStates)
---  print (head quads)
   let ts = 0.01 :: Double
       trails0 = initTrails (head quads)
       state0 = State (cycle ((map Just quads) ++ [Nothing])) trails0
